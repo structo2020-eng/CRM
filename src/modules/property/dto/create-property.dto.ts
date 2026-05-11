@@ -16,10 +16,17 @@ export class CreatePropertyDto {
   @IsNotEmpty()
   title!: string;
 
+  // 🚀 إضافة حقل الـ ref
+  @IsString()
+  @IsOptional()
+  ref?: string;
+
+  // 🚀 توحيد الاسم ليطابق الفرونت إند
   @IsEnum(PropertyType)
   @IsNotEmpty()
-  type!: PropertyType;
+  propertyType!: PropertyType;
 
+  // ⚠️ لا تنسَ إرسال هذا الحقل من الفرونت إند (مثال: buy أو rent)
   @IsEnum(Purpose)
   @IsNotEmpty()
   purpose!: Purpose;
@@ -30,13 +37,14 @@ export class CreatePropertyDto {
 
   @IsNumber()
   @Min(0)
-  @Type(() => Number)
+  @Type(() => Number) // مهم جداً لأن form-data ترسل الأرقام كنصوص
   price!: number;
 
+  // 🚀 توحيد الاسم ليطابق الفرونت إند
   @IsNumber()
   @Min(1)
   @Type(() => Number)
-  areaSqm!: number;
+  area!: number;
 
   @IsNumber()
   @IsOptional()
@@ -53,19 +61,15 @@ export class CreatePropertyDto {
   @Type(() => Number)
   floor?: number;
 
+  // 🚀 توحيد الاسم ليطابق الفرونت إند (دمجنا المدينة والمنطقة في حقل واحد)
   @IsString()
   @IsNotEmpty()
-  locationCity!: string;
-
-  @IsString()
-  @IsOptional()
-  locationDistrict?: string;
+  location!: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
-  // سنستقبل قائمة المميزات كنص مفصول بفاصلة ونحوله لمصفوفة، أو كمصفوفة مباشرة
   @IsOptional()
   amenities?: string[] | string;
 }

@@ -11,10 +11,10 @@ export class Lead extends Document {
   lastName!: string;
 
   @Prop({ required: true, trim: true })
-  phoneNumber!: string;
+  phone!: string; // تم التعديل
 
   @Prop({ lowercase: true, trim: true })
-  emailAddress!: string;
+  email!: string; // تم التعديل
 
   @Prop({ trim: true })
   nationality!: string;
@@ -26,8 +26,11 @@ export class Lead extends Document {
   @Prop({ type: String })
   propertyType!: string;
 
+  @Prop({ type: String })
+  purpose!: string; // الحقل الجديد
+
   @Prop({ trim: true })
-  preferredLocation!: string;
+  location!: string; // تم التعديل
 
   @Prop({ type: Number })
   bedrooms!: number;
@@ -36,7 +39,7 @@ export class Lead extends Document {
   bathrooms!: number;
 
   @Prop({ type: [String], default: [] })
-  mustHaveAmenities!: string[];
+  amenities!: string[]; // تم التعديل
 
   // --- Budget ---
   @Prop({ type: Number })
@@ -46,41 +49,37 @@ export class Lead extends Document {
   maxBudget!: number;
 
   @Prop({ type: String })
-  moveInTimeframe!: string;
+  moveIn!: string; // تم التعديل
 
   @Prop({ type: String })
-  urgencyLevel!: string;
+  urgency!: string; // تم التعديل
 
   @Prop({ trim: true })
-  additionalNotes!: string;
+  notes!: string; // تم التعديل
 
   // --- System & Tracking Data ---
-  // 🚀 العزل التام: هذا الحقل يضمن عدم تداخل بيانات الشركات
   @Prop({ type: Types.ObjectId, ref: 'Company', required: true, index: true })
   company_id!: Types.ObjectId;
 
-  // الموظف المسؤول عن العميل
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  assignedAgent!: Types.ObjectId;
+  assigned_agent_id!: Types.ObjectId; // تم التعديل
 
-  // من قام بإدخال العميل للنظام
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   created_by!: Types.ObjectId;
 
   @Prop({ type: String, default: 'new' })
-  status!: string; // new, contacted, qualified, lost
+  status!: string;
 
   @Prop({ type: String })
   lostReason?: string;
 
-  // 🚀 الحذف الوهمي لمنع فقدان البيانات المرتبطة بالحسابات
   @Prop({ default: false, index: true })
   isDeleted!: boolean;
 }
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);
 
-// إنشاء Index مركب لتسريع البحث داخل نفس الشركة (تم تغيير phone إلى phoneNumber)
-LeadSchema.index({ company_id: 1, phoneNumber: 1 }, { unique: true });
+// تم تحديث الـ Index المركب ليطابق اسم حقل الهاتف الجديد (phone)
+LeadSchema.index({ company_id: 1, phone: 1 }, { unique: true });
 
 export const LeadModelName = Lead.name;

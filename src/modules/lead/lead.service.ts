@@ -31,7 +31,6 @@ export class LeadService {
     });
   }
 
-  // 🚀 دالة استيراد الإكسيل المحدثة
   async importFromExcel(
     fileBuffer: Buffer,
     companyId: Types.ObjectId,
@@ -47,10 +46,9 @@ export class LeadService {
         throw new BadRequestException('The excel file is empty.');
       }
 
-      // 3. تنظيف البيانات وتوزيعها على الحقول الجديدة
+      // تنظيف البيانات وتوزيعها على الحقول الجديدة
       const leadsToInsert = data
         .map((row) => {
-          // فصل الاسم إلى اسم أول واسم أخير
           const rawName = row['Name'] || row['الاسم'] || '';
           const nameParts = rawName.trim().split(' ');
           const firstName = nameParts[0];
@@ -60,18 +58,19 @@ export class LeadService {
           return {
             firstName: firstName,
             lastName: lastName,
-            phoneNumber:
+            // تم التعديل
+            phone:
               row['Phone'] || row['رقم الهاتف']
                 ? String(row['Phone'] || row['رقم الهاتف']).trim()
                 : undefined,
-            emailAddress: row['Email'] || row['البريد الإلكتروني'],
+            email: row['Email'] || row['البريد الإلكتروني'], // تم التعديل
             leadSource: row['Source'] || row['المصدر'] || 'walk_in',
             status: 'new',
             company_id: companyId,
             created_by: createdBy,
           };
         })
-        .filter((lead) => lead.firstName && lead.phoneNumber);
+        .filter((lead) => lead.firstName && lead.phone); // تم التعديل
 
       if (leadsToInsert.length === 0) {
         throw new BadRequestException(
@@ -113,8 +112,7 @@ export class LeadService {
 
     // التحقق من أدوار المبيعات
     if ([Role.sales_agent, Role.agent].includes(user.role as Role)) {
-      // تعديل assigned_to إلى assignedAgent
-      filter.$or = [{ assignedAgent: user.sub }, { created_by: user.sub }];
+      filter.$or = [{ assigned_agent_id: user.sub }, { created_by: user.sub }]; // تم التعديل
     }
 
     return await this.leadRepository.findAll({
@@ -122,8 +120,7 @@ export class LeadService {
       companyId: user.company_id,
       paginate: { page, limit },
       sort: { createdAt: -1 },
-      // تعديل اسم الحقل وجلب fullName للموظف
-      populate: { path: 'assignedAgent', select: 'fullName email' },
+      populate: { path: 'assigned_agent_id', select: 'fullName email' }, // تم التعديل
     });
   }
 
@@ -131,8 +128,7 @@ export class LeadService {
     const lead = await this.leadRepository.findOne({
       filter: { _id: id, isDeleted: false },
       companyId,
-      // تعديل اسم الحقل وجلب fullName للموظف
-      populate: { path: 'assignedAgent', select: 'fullName email' },
+      populate: { path: 'assigned_agent_id', select: 'fullName email' }, // تم التعديل
     });
 
     if (!lead) {
@@ -179,8 +175,7 @@ export class LeadService {
   ) {
     const updatedLead = await this.leadRepository.update({
       filter: { _id: leadId, isDeleted: false },
-      // تعديل assigned_to إلى assignedAgent
-      update: { $set: { assignedAgent: agentId, status: 'contacted' } },
+      update: { $set: { assigned_agent_id: agentId, status: 'contacted' } }, // تم التعديل
       companyId,
     });
 

@@ -10,17 +10,38 @@ export class PropertyService {
   constructor(
     private readonly propertyRepository: PropertyRepository,
     private readonly i18n: I18nService,
+    // 💡 يمكنك حقن CloudinaryService هنا لاحقاً لرفع الصور
+    // private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   async create(
     createPropertyDto: CreatePropertyDto,
+    files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] }, // 🚀 استقبال الملفات
     companyId: Types.ObjectId,
-    userId: Types.ObjectId, // نستقبل الـ userId من الكنترولر
+    userId: Types.ObjectId,
   ) {
+    // 🚀 التعديل السحري: معالجة الـ Amenities القادمة من form-data
+    let parsedAmenities: string[] = [];
+    if (typeof createPropertyDto.amenities === 'string') {
+      // إذا أرسلها الفرونت إند كنص مفصول بفاصلة، نحولها لمصفوفة وننظف المسافات
+      parsedAmenities = createPropertyDto.amenities
+        .split(',')
+        .map((item) => item.trim());
+    } else if (Array.isArray(createPropertyDto.amenities)) {
+      parsedAmenities = createPropertyDto.amenities;
+    }
+
+    // 💡 TODO: كود رفع الصور مستقبلاً
+    // const uploadedMedia = files.media ? await this.cloudinaryService.uploadMultiple(files.media) : [];
+    // const uploadedFloorPlan = files.floorPlan ? await this.cloudinaryService.uploadSingle(files.floorPlan[0]) : null;
+
     return await this.propertyRepository.create({
       ...createPropertyDto,
+      amenities: parsedAmenities, // حفظ المصفوفة النظيفة بدلاً من القيمة الخام
       company_id: companyId,
-      listedByAgent: userId, // 🚀 التعديل السحري: غيرنا الاسم ليتطابق مع الداتا بيز
+      listedByAgent: userId,
+      // media: uploadedMedia,
+      // floorPlan: uploadedFloorPlan,
     });
   }
 
@@ -34,6 +55,7 @@ export class PropertyService {
       paginate: { page, limit },
       sort: { createdAt: -1 },
       companyId, // 🚀 الأمان الإجباري: حقن معرف الشركة
+      populate: { path: 'listedByAgent', select: 'fullName email phone' }, // جلب بيانات الوكيل الذي أضاف العقار
     });
   }
 
@@ -41,6 +63,7 @@ export class PropertyService {
     const property = await this.propertyRepository.findOne({
       filter: { _id: id, isDeleted: false },
       companyId,
+      populate: { path: 'listedByAgent', select: 'fullName email phone' },
     });
 
     if (!property) {

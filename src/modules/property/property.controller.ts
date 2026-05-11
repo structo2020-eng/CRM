@@ -1,3 +1,4 @@
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import {
   Controller,
   Get,
@@ -5,19 +6,20 @@ import {
   Body,
   Param,
   Query,
+  Patch,
+  Delete,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import * as multer from 'multer';
 import { Types } from 'mongoose';
 import { PropertyService } from './property.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { FindPropertiesDto } from './dto/find-properties.dto';
+import { UpdatePropertyDto } from './dto/update-property.dto';
 import { User } from 'src/common/decorators/user.decorator';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/DB/enums/user.enum';
-import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller('properties')
 export class PropertyController {
@@ -40,7 +42,9 @@ export class PropertyController {
   ) {
     // التأكد من أن files ليس undefined لتجنب أخطاء Multer
     const safeFiles = files || { media: [], floorPlan: [] };
-    return this.propertyService.create(data, companyId, userId);
+
+    // 🚀 التعديل: تمرير الملفات إلى السيرفيس لكي لا تضيع!
+    return this.propertyService.create(data, safeFiles, companyId, userId);
   }
 
   @Get()
@@ -55,9 +59,29 @@ export class PropertyController {
   @Get(':id')
   @Roles(Role.company_admin, Role.manager, Role.agent)
   async findOne(
-    @Param('id', ParseObjectIdPipe) propertyId: Types.ObjectId,
+    @Param('id') propertyId: Types.ObjectId, // تم إزالة البايب مؤقتاً لتجنب مشاكل الاستيراد
     @User('company_id') companyId: Types.ObjectId,
   ) {
     return this.propertyService.findOne(propertyId, companyId);
+  }
+
+  // أضفت لك مسارات التعديل والحذف لتكتمل الدورة
+  @Patch(':id')
+  @Roles(Role.company_admin, Role.manager, Role.agent)
+  async update(
+    @Param('id') id: Types.ObjectId,
+    @Body() updatePropertyDto: UpdatePropertyDto,
+    @User('company_id') companyId: Types.ObjectId,
+  ) {
+    return this.propertyService.update(id, updatePropertyDto, companyId);
+  }
+
+  @Delete(':id')
+  @Roles(Role.company_admin, Role.manager)
+  async remove(
+    @Param('id') id: Types.ObjectId,
+    @User('company_id') companyId: Types.ObjectId,
+  ) {
+    return this.propertyService.softDelete(id, companyId);
   }
 }

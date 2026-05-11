@@ -8,15 +8,19 @@ import type { Image } from 'src/common/types/image.type';
 
 @Schema({ timestamps: true })
 export class Property {
-  // 🚀 مفتاح العزل الأساسي
   @Prop({ type: Types.ObjectId, ref: CompanyModelName, required: true })
   company_id!: Types.ObjectId;
 
   @Prop({ type: String, required: true })
   title!: string;
 
+  // 🚀 إضافة حقل الـ ref (يفضل أن يكون unique داخل نفس الشركة لو أمكن)
+  @Prop({ type: String })
+  ref?: string;
+
+  // 🚀 توحيد الاسم
   @Prop({ type: String, enum: PropertyType, required: true })
-  type!: PropertyType;
+  propertyType!: PropertyType;
 
   @Prop({ type: String, enum: Purpose, required: true })
   purpose!: Purpose;
@@ -28,15 +32,12 @@ export class Property {
   })
   status!: PropertyStatus;
 
-  // يمكن أن يكون العقار جزءاً من مشروع/كمبوند (اختياري)
-  // @Prop({ type: Types.ObjectId, ref: 'Project' })
-  // projectId?: Types.ObjectId;
-
   @Prop({ type: Number, required: true })
   price!: number;
 
+  // 🚀 توحيد الاسم
   @Prop({ type: Number, required: true })
-  areaSqm!: number;
+  area!: number;
 
   @Prop({ type: Number })
   bedrooms?: number;
@@ -50,12 +51,9 @@ export class Property {
   @Prop({ type: [String], default: [] })
   amenities!: string[];
 
-  // --- الموقع (Location) ---
+  // 🚀 توحيد الاسم ليكون location فقط
   @Prop({ type: String, required: true })
-  locationCity!: string;
-
-  @Prop({ type: String })
-  locationDistrict?: string;
+  location!: string;
 
   @Prop({ type: Number })
   latitude?: number;
@@ -63,7 +61,7 @@ export class Property {
   @Prop({ type: Number })
   longitude?: number;
 
-  // --- الميديا ---
+  // --- الميديا (يتم التعامل معها عبر الـ Interceptor والـ Service) ---
   @Prop({ type: [{ secure_url: String, public_id: String }], default: [] })
   media!: Image[];
 
@@ -73,7 +71,6 @@ export class Property {
   @Prop({ type: String })
   description?: string;
 
-  // --- الروابط (Relations) ---
   @Prop({ type: Types.ObjectId, ref: UserModelName, required: true })
   listedByAgent!: Types.ObjectId;
 }

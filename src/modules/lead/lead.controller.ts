@@ -91,6 +91,17 @@ export class LeadController {
     return await this.leadService.update(id, updateLeadDto, user.company_id);
   }
 
+  // 🚀 المسار الجديد: تعيين عميل لمندوب مبيعات
+  @Patch(':id/assign')
+  @Roles(Role.company_admin, Role.sales_manager) // المدراء فقط من يوزعون العملاء
+  async assignToAgent(
+    @Param('id') leadId: Types.ObjectId,
+    @Body('assigned_agent_id') agentId: Types.ObjectId,
+    @User('company_id') companyId: Types.ObjectId,
+  ) {
+    return await this.leadService.assignToAgent(leadId, agentId, companyId);
+  }
+
   @Delete(':id')
   @Roles(Role.company_admin, Role.sales_manager)
   async remove(@Param('id') id: Types.ObjectId, @User() user: JwtPayload) {

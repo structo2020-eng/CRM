@@ -4,6 +4,7 @@ import {
   UploadApiResponse,
   UploadApiErrorResponse,
 } from 'cloudinary';
+import * as Multer from 'multer';
 const toStream = require('buffer-to-stream');
 @Injectable()
 export class CloudinaryService {

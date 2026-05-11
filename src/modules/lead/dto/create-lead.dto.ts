@@ -7,10 +7,10 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Types } from 'mongoose';
-// افترض أننا أضفنا هذه الـ Enums الجديدة في ملف lead.enum.ts
 import {
   LeadSource,
   PropertyType,
@@ -30,11 +30,11 @@ export class CreateLeadDto {
 
   @IsString()
   @IsNotEmpty()
-  phoneNumber!: string;
+  phone!: string; // تم التعديل
 
   @IsEmail()
   @IsOptional()
-  emailAddress?: string;
+  email?: string; // تم التعديل
 
   @IsString()
   @IsOptional()
@@ -50,8 +50,13 @@ export class CreateLeadDto {
   propertyType?: PropertyType;
 
   @IsString()
+  @IsIn(['buy', 'rent', 'invest']) // الحقل الجديد
   @IsOptional()
-  preferredLocation?: string;
+  purpose?: string;
+
+  @IsString()
+  @IsOptional()
+  location?: string; // تم التعديل
 
   @IsNumber()
   @IsOptional()
@@ -66,7 +71,7 @@ export class CreateLeadDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  mustHaveAmenities?: string[];
+  amenities?: string[]; // تم التعديل
 
   // --- Step 3: Budget ---
   @IsNumber()
@@ -81,18 +86,18 @@ export class CreateLeadDto {
 
   @IsEnum(MoveInTimeframe)
   @IsOptional()
-  moveInTimeframe?: MoveInTimeframe;
+  moveIn?: MoveInTimeframe; // تم التعديل
 
   @IsEnum(UrgencyLevel)
   @IsOptional()
-  urgencyLevel?: UrgencyLevel;
+  urgency?: UrgencyLevel; // تم التعديل
 
   @IsString()
   @IsOptional()
-  additionalNotes?: string;
+  notes?: string; // تم التعديل
 
   // --- Step 4: Assignment ---
   @IsMongoId()
   @IsOptional()
-  assignedAgent?: Types.ObjectId;
+  assigned_agent_id?: Types.ObjectId; // تم التعديل
 }
