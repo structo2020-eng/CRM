@@ -73,6 +73,11 @@ export class CreateLeadDto {
   @IsOptional()
   amenities?: string[]; // تم التعديل
 
+  @IsString()
+  @IsOptional()
+  @IsIn(['new', 'contacted', 'qualified', 'lost'])
+  status?: string;
+
   // --- Step 3: Budget ---
   @IsNumber()
   @IsOptional()

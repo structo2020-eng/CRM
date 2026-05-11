@@ -73,6 +73,9 @@ export class Property {
 
   @Prop({ type: Types.ObjectId, ref: UserModelName, required: true })
   listedByAgent!: Types.ObjectId;
+
+  @Prop({ type: String })
+  videoUrl?: string;
 }
 
 export const PropertySchema = SchemaFactory.createForClass(Property);
