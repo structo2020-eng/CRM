@@ -28,7 +28,6 @@ export class CreatePropertyDto {
   @IsNotEmpty()
   propertyType!: PropertyType;
 
-  // ⚠️ لا تنسَ إرسال هذا الحقل من الفرونت إند (مثال: buy أو rent)
   @IsEnum(Purpose)
   @IsNotEmpty()
   purpose!: Purpose;
