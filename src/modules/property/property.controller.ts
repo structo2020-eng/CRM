@@ -65,13 +65,20 @@ export class PropertyController {
     return this.propertyService.findOne(propertyId, companyId);
   }
 
-  // أضفت لك مسارات التعديل والحذف لتكتمل الدورة
   @Patch(':id')
   @Roles(Role.company_admin, Role.manager, Role.agent)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'media', maxCount: 10 },
+      { name: 'floorPlan', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() updatePropertyDto: UpdatePropertyDto,
     @User('company_id') companyId: Types.ObjectId,
+    @UploadedFiles()
+    files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] },
   ) {
     return this.propertyService.update(id, updatePropertyDto, companyId);
   }

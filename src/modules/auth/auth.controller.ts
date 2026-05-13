@@ -16,7 +16,7 @@ import { Public } from 'src/common/decorators/public.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public() // 🚀 تخطي حارس الـ JWT لأن المستخدم غير مسجل دخول بعد
+  @Public() //  تخطي حارس الـ JWT لأن المستخدم غير مسجل دخول بعد
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {

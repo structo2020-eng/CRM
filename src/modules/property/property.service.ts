@@ -84,19 +84,29 @@ export class PropertyService {
     updatePropertyDto: UpdatePropertyDto,
     companyId: Types.ObjectId,
   ) {
+    // 🚀 معالجة المصفوفات القادمة من form-data (مع إرضاء TypeScript)
+    const updateData: any = updatePropertyDto;
+
+    if (updateData.amenities) {
+      if (typeof updateData.amenities === 'string') {
+        updateData.amenities = updateData.amenities
+          .split(',')
+          .map((item: string) => item.trim());
+      }
+    }
+
     const updatedProperty = await this.propertyRepository.update({
       filter: { _id: id, isDeleted: { $ne: true } },
-      update: { $set: updatePropertyDto },
-      options: { returnDocument: 'after' },
+      update: { $set: updateData },
       companyId,
     });
 
     if (!updatedProperty) {
       throw new NotFoundException(this.i18n.t('events.PROPERTY_NOT_FOUND'));
     }
+
     return updatedProperty;
   }
-
   async softDelete(id: Types.ObjectId, companyId: Types.ObjectId) {
     const deletedProperty = await this.propertyRepository.update({
       filter: { _id: id },
