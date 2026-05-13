@@ -77,4 +77,14 @@ export class CreatePropertyDto {
   @IsUrl({}, { message: 'Please provide a valid URL for the video' }) // اختياري: للتأكد أنه رابط حقيقي
   @IsOptional()
   videoUrl?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  latitude?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  longitude?: number;
 }
