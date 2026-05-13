@@ -20,12 +20,13 @@ async function bootstrap() {
   // 2. الحماية والأمان (Security)
   app.use(helmet()); // حماية الـ Headers
   //  تفعيل الـ CORS ليقبل أي موقع (Public) مع دعم التوكنز
+  // 🚀 التفعيل القاطع للـ CORS
   app.enableCors({
-    origin: true, // هذا السطر السحري سيسمح لأي دومين بالاتصال بدون مشاكل
+    origin: ['http://localhost:4200'], // صرحنا للفرونت إند المحلي بالاسم
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
-
   app.use(compression()); // ضغط الاستجابات لتقليل الحجم وتسريع التطبيق
 
   // 3. التنسيق العالمي (Global Configuration)
