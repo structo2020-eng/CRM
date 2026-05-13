@@ -51,6 +51,7 @@ export class PropertyService {
       floorPlan: uploadedFloorPlan,
     });
   }
+
   async findAll(
     companyId: Types.ObjectId,
     page: number = 1,
@@ -82,9 +83,10 @@ export class PropertyService {
   async update(
     id: Types.ObjectId,
     updatePropertyDto: UpdatePropertyDto,
+    files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] }, // 🚀 المتغير الجديد لاستقبال الصور
     companyId: Types.ObjectId,
   ) {
-    // 🚀 معالجة المصفوفات القادمة من form-data (مع إرضاء TypeScript)
+    //  معالجة المصفوفات القادمة من form-data
     const updateData: any = updatePropertyDto;
 
     if (updateData.amenities) {
@@ -93,6 +95,20 @@ export class PropertyService {
           .split(',')
           .map((item: string) => item.trim());
       }
+    }
+
+    // 🚀 معالجة ورفع الصور الجديدة (إن وجدت)
+    if (files?.media && files.media.length > 0) {
+      updateData.media = await Promise.all(
+        files.media.map((file) => this.cloudinaryService.uploadFile(file)),
+      );
+    }
+
+    //  معالجة المخطط الهندسي (إن وجد)
+    if (files?.floorPlan && files.floorPlan.length > 0) {
+      updateData.floorPlan = await this.cloudinaryService.uploadFile(
+        files.floorPlan[0],
+      );
     }
 
     const updatedProperty = await this.propertyRepository.update({
@@ -107,6 +123,7 @@ export class PropertyService {
 
     return updatedProperty;
   }
+
   async softDelete(id: Types.ObjectId, companyId: Types.ObjectId) {
     const deletedProperty = await this.propertyRepository.update({
       filter: { _id: id },

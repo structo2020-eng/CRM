@@ -64,7 +64,6 @@ export class PropertyController {
   ) {
     return this.propertyService.findOne(propertyId, companyId);
   }
-
   @Patch(':id')
   @Roles(Role.company_admin, Role.manager, Role.agent)
   @UseInterceptors(
@@ -76,11 +75,18 @@ export class PropertyController {
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() updatePropertyDto: UpdatePropertyDto,
-    @User('company_id') companyId: Types.ObjectId,
-    @UploadedFiles()
+    @UploadedFiles() //  إضافة استقبال الملفات هنا
     files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] },
+    @User('company_id') companyId: Types.ObjectId,
   ) {
-    return this.propertyService.update(id, updatePropertyDto, companyId);
+    const safeFiles = files || { media: [], floorPlan: [] };
+    // 🚀 تمرير الملفات للسيرفيس
+    return this.propertyService.update(
+      id,
+      updatePropertyDto,
+      safeFiles,
+      companyId,
+    );
   }
 
   @Delete(':id')
