@@ -31,4 +31,8 @@ export class UpdatePropertyDto {
   @IsArray()
   @IsString({ each: true })
   features?: string[];
+
+  @IsString()
+  @IsOptional()
+  ref?: string;
 }
