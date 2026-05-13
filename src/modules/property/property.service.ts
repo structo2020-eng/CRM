@@ -4,6 +4,7 @@ import { I18nService } from 'nestjs-i18n';
 import { PropertyRepository } from 'src/DB/repositories/property.repository';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
 
 @Injectable()
 export class PropertyService {
@@ -11,19 +12,16 @@ export class PropertyService {
     private readonly propertyRepository: PropertyRepository,
     private readonly i18n: I18nService,
     // 💡 يمكنك حقن CloudinaryService هنا لاحقاً لرفع الصور
-    // private readonly cloudinaryService: CloudinaryService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
-
   async create(
     createPropertyDto: CreatePropertyDto,
-    files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] }, // 🚀 استقبال الملفات
+    files: { media?: Express.Multer.File[]; floorPlan?: Express.Multer.File[] },
     companyId: Types.ObjectId,
     userId: Types.ObjectId,
   ) {
-    // 🚀 التعديل السحري: معالجة الـ Amenities القادمة من form-data
     let parsedAmenities: string[] = [];
     if (typeof createPropertyDto.amenities === 'string') {
-      // إذا أرسلها الفرونت إند كنص مفصول بفاصلة، نحولها لمصفوفة وننظف المسافات
       parsedAmenities = createPropertyDto.amenities
         .split(',')
         .map((item) => item.trim());
@@ -31,20 +29,29 @@ export class PropertyService {
       parsedAmenities = createPropertyDto.amenities;
     }
 
-    // 💡 TODO: كود رفع الصور مستقبلاً
-    // const uploadedMedia = files.media ? await this.cloudinaryService.uploadMultiple(files.media) : [];
-    // const uploadedFloorPlan = files.floorPlan ? await this.cloudinaryService.uploadSingle(files.floorPlan[0]) : null;
+    // 🚀 التعديل هنا: استخدام uploadFile لرفع الميديا (بشكل متوازٍ لتسريع الرفع)
+    const uploadedMedia =
+      files?.media && files.media.length > 0
+        ? await Promise.all(
+            files.media.map((file) => this.cloudinaryService.uploadFile(file)),
+          )
+        : [];
+
+    // 🚀 التعديل هنا: استخدام uploadFile لرفع المخطط الهندسي
+    const uploadedFloorPlan =
+      files?.floorPlan && files.floorPlan.length > 0
+        ? await this.cloudinaryService.uploadFile(files.floorPlan[0])
+        : null;
 
     return await this.propertyRepository.create({
       ...createPropertyDto,
-      amenities: parsedAmenities, // حفظ المصفوفة النظيفة بدلاً من القيمة الخام
+      amenities: parsedAmenities,
       company_id: companyId,
       listedByAgent: userId,
-      // media: uploadedMedia,
-      // floorPlan: uploadedFloorPlan,
+      media: uploadedMedia,
+      floorPlan: uploadedFloorPlan,
     });
   }
-
   async findAll(
     companyId: Types.ObjectId,
     page: number = 1,
@@ -81,6 +88,7 @@ export class PropertyService {
     const updatedProperty = await this.propertyRepository.update({
       filter: { _id: id, isDeleted: { $ne: true } },
       update: { $set: updatePropertyDto },
+      options: { new: true },
       companyId,
     });
 

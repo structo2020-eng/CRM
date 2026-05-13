@@ -8,6 +8,7 @@ import {
   IsString,
   IsUrl,
   Min,
+  ValidateIf,
 } from 'class-validator';
 import { PropertyType, Purpose } from 'src/DB/enums/lead.enum';
 import { PropertyStatus } from 'src/DB/enums/property.enum';
@@ -73,9 +74,11 @@ export class CreatePropertyDto {
 
   @IsOptional()
   amenities?: string[] | string;
-  @IsString()
-  @IsUrl({}, { message: 'Please provide a valid URL for the video' }) // اختياري: للتأكد أنه رابط حقيقي
+
+  @ValidateIf((object, value) => value !== '')
   @IsOptional()
+  @IsString()
+  @IsUrl({}, { message: 'Please provide a valid URL for the video' })
   videoUrl?: string;
 
   @IsNumber()
