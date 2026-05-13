@@ -11,7 +11,6 @@ export class PropertyService {
   constructor(
     private readonly propertyRepository: PropertyRepository,
     private readonly i18n: I18nService,
-    // 💡 يمكنك حقن CloudinaryService هنا لاحقاً لرفع الصور
     private readonly cloudinaryService: CloudinaryService,
   ) {}
   async create(
@@ -29,7 +28,7 @@ export class PropertyService {
       parsedAmenities = createPropertyDto.amenities;
     }
 
-    // 🚀 التعديل هنا: استخدام uploadFile لرفع الميديا (بشكل متوازٍ لتسريع الرفع)
+    //  التعديل هنا: استخدام uploadFile لرفع الميديا (بشكل متوازٍ لتسريع الرفع)
     const uploadedMedia =
       files?.media && files.media.length > 0
         ? await Promise.all(
@@ -37,7 +36,7 @@ export class PropertyService {
           )
         : [];
 
-    // 🚀 التعديل هنا: استخدام uploadFile لرفع المخطط الهندسي
+    //  التعديل هنا: استخدام uploadFile لرفع المخطط الهندسي
     const uploadedFloorPlan =
       files?.floorPlan && files.floorPlan.length > 0
         ? await this.cloudinaryService.uploadFile(files.floorPlan[0])
@@ -61,7 +60,7 @@ export class PropertyService {
       filter: { isDeleted: { $ne: true } },
       paginate: { page, limit },
       sort: { createdAt: -1 },
-      companyId, // 🚀 الأمان الإجباري: حقن معرف الشركة
+      companyId, //  الأمان الإجباري: حقن معرف الشركة
       populate: { path: 'listedByAgent', select: 'fullName email phone' }, // جلب بيانات الوكيل الذي أضاف العقار
     });
   }
@@ -88,7 +87,7 @@ export class PropertyService {
     const updatedProperty = await this.propertyRepository.update({
       filter: { _id: id, isDeleted: { $ne: true } },
       update: { $set: updatePropertyDto },
-      options: { new: true },
+      options: { returnDocument: 'after' },
       companyId,
     });
 
