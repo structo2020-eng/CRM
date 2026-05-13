@@ -7,7 +7,7 @@ import { CloudinaryModule } from 'src/modules/cloudinary/cloudinary.module';
 @Module({
   imports: [
     PropertyModel,
-    CloudinaryModule, // 🚀 لتشغيل رفع الصور على كلاوديناري
+    CloudinaryModule, //  لتشغيل رفع الصور على كلاوديناري
   ],
   controllers: [PropertyController],
   providers: [PropertyService, PropertyRepository],
