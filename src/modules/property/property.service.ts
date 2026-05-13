@@ -61,7 +61,7 @@ export class PropertyService {
 
   async findOne(id: Types.ObjectId, companyId: Types.ObjectId) {
     const property = await this.propertyRepository.findOne({
-      filter: { _id: id, isDeleted: false },
+      filter: { _id: id, isDeleted: { $ne: true } },
       companyId,
       populate: { path: 'listedByAgent', select: 'fullName email phone' },
     });
@@ -79,7 +79,7 @@ export class PropertyService {
     companyId: Types.ObjectId,
   ) {
     const updatedProperty = await this.propertyRepository.update({
-      filter: { _id: id, isDeleted: false },
+      filter: { _id: id, isDeleted: { $ne: true } },
       update: { $set: updatePropertyDto },
       companyId,
     });

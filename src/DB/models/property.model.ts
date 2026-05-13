@@ -76,6 +76,9 @@ export class Property {
 
   @Prop({ type: String })
   videoUrl?: string;
+
+  @Prop({ default: false, index: true })
+  isDeleted!: boolean;
 }
 
 export const PropertySchema = SchemaFactory.createForClass(Property);
