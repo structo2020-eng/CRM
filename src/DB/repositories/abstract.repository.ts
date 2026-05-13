@@ -118,7 +118,7 @@ export abstract class AbstractRepository<TDocument> {
   }: updateArgs<TDocument>): Promise<TDocument | null> {
     const tenantFilter = this.applyTenantFilter(filter, companyId);
     let query = this.model.findOneAndUpdate(tenantFilter, update, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
       ...options,
     });
