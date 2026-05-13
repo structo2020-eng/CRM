@@ -19,7 +19,7 @@ import { Type } from 'class-transformer';
 export class FindLeadsDto {
   @IsOptional()
   @IsString()
-  k?: string; // كلمة البحث (الاسم الأول، الأخير، أو رقم الهاتف)
+  k?: string; //كلمة البحث (الاسم الأول، الأخير، أو رقم الهاتف)
 
   @IsOptional()
   @IsEnum(LeadStatus)
