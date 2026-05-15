@@ -60,13 +60,11 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   // 6. تشغيل السيرفر
-  await app.listen(port);
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
 
-  logger.log(`==========================================================`);
   logger.log(`🚀 Application is running on: http://localhost:${port}/api/v1`);
   logger.log(`📖 Swagger Documentation: http://localhost:${port}/api-docs`);
   logger.log(`🛠️  Environment: ${nodeEnv || 'development'}`);
-  logger.log(`==========================================================`);
 }
 
 bootstrap();

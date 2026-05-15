@@ -13,7 +13,10 @@ import { UserRepository } from 'src/DB/repositories/user.repository';
 import { TokenRepository } from 'src/DB/repositories/token.repository';
 
 @WebSocketGateway({
-  cors: { origin: '*' }, // في بيئة الإنتاج يفضل تحديد رابط الـ Frontend
+  cors: {
+    origin: true, //  يجعل السيرفر يصرح للدومين الطالب بشكل ديناميكي
+    credentials: true,
+  },
 })
 export class NotificationGateway
   implements OnGatewayConnection, OnGatewayDisconnect
