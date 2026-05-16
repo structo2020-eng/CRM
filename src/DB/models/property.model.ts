@@ -14,11 +14,9 @@ export class Property {
   @Prop({ type: String, required: true })
   title!: string;
 
-  // 🚀 إضافة حقل الـ ref (يفضل أن يكون unique داخل نفس الشركة لو أمكن)
   @Prop({ type: String })
   ref?: string;
 
-  // 🚀 توحيد الاسم
   @Prop({ type: String, enum: PropertyType, required: true })
   propertyType!: PropertyType;
 
@@ -35,7 +33,6 @@ export class Property {
   @Prop({ type: Number, required: true })
   price!: number;
 
-  // 🚀 توحيد الاسم
   @Prop({ type: Number, required: true })
   area!: number;
 
@@ -51,7 +48,6 @@ export class Property {
   @Prop({ type: [String], default: [] })
   amenities!: string[];
 
-  // 🚀 توحيد الاسم ليكون location فقط
   @Prop({ type: String, required: true })
   location!: string;
 
@@ -61,7 +57,6 @@ export class Property {
   @Prop({ type: Number })
   longitude?: number;
 
-  // --- الميديا (يتم التعامل معها عبر الـ Interceptor والـ Service) ---
   @Prop({ type: [{ secure_url: String, public_id: String }], default: [] })
   media!: Image[];
 

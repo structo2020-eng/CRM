@@ -11,10 +11,10 @@ export class Lead extends Document {
   lastName!: string;
 
   @Prop({ required: true, trim: true })
-  phone!: string; // تم التعديل
+  phone!: string;
 
   @Prop({ lowercase: true, trim: true })
-  email!: string; // تم التعديل
+  email!: string;
 
   @Prop({ trim: true })
   nationality!: string;
@@ -27,10 +27,10 @@ export class Lead extends Document {
   propertyType!: string;
 
   @Prop({ type: String })
-  purpose!: string; // الحقل الجديد
+  purpose!: string;
 
   @Prop({ trim: true })
-  location!: string; // تم التعديل
+  location!: string;
 
   @Prop({ type: Number })
   bedrooms!: number;
@@ -39,7 +39,7 @@ export class Lead extends Document {
   bathrooms!: number;
 
   @Prop({ type: [String], default: [] })
-  amenities!: string[]; // تم التعديل
+  amenities!: string[];
 
   // --- Budget ---
   @Prop({ type: Number })
@@ -49,20 +49,20 @@ export class Lead extends Document {
   maxBudget!: number;
 
   @Prop({ type: String })
-  moveIn!: string; // تم التعديل
+  moveIn!: string;
 
   @Prop({ type: String })
-  urgency!: string; // تم التعديل
+  urgency!: string;
 
   @Prop({ trim: true })
-  notes!: string; // تم التعديل
+  notes!: string;
 
   // --- System & Tracking Data ---
   @Prop({ type: Types.ObjectId, ref: 'Company', required: true, index: true })
   company_id!: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  assigned_agent_id!: Types.ObjectId; // تم التعديل
+  assigned_agent_id!: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   created_by!: Types.ObjectId;
@@ -79,7 +79,6 @@ export class Lead extends Document {
 
 export const LeadSchema = SchemaFactory.createForClass(Lead);
 
-// تم تحديث الـ Index المركب ليطابق اسم حقل الهاتف الجديد (phone)
 LeadSchema.index({ company_id: 1, phone: 1 }, { unique: true });
 
 export const LeadModelName = Lead.name;

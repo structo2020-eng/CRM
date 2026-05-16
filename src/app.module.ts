@@ -118,7 +118,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     // 7. تفعيل المهام المجدولة (Cron Jobs)
     ScheduleModule.forRoot(),
 
-    // 8. 🚀 تسجيل كل الموديولات ليتعرف عليها السيرفر
+    // 8.  تسجيل كل الموديولات ليتعرف عليها السيرفر
     AuthModule,
     LeadModule,
     BranchModule,

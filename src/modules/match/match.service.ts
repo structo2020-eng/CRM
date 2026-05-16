@@ -17,15 +17,13 @@ export class MatchService {
     private readonly i18n: I18nService,
   ) {}
 
-  // 1. خوارزمية المطابقة التلقائية (تُستدعى يدوياً أو عبر Cron Job)
+  // 1. خوارزمية المطابقة التلقائية (النسخة المتوافقة تماماً مع الـ Schema)
   async generateAutoMatches(companyId: Types.ObjectId) {
-    // جلب العملاء الجدد (تخيل أن لديهم حقول budget و desired_location)
     const leadsResult = await this.leadRepository.findAll({
       filter: { status: 'new' },
-      companyId, // 🚀 العزل الإجباري للشركة
+      companyId,
     });
 
-    // جلب العقارات المتاحة للبيع أو الإيجار
     const propertiesResult = await this.propertyRepository.findAll({
       filter: { status: 'available' as any },
       companyId,
@@ -37,27 +35,55 @@ export class MatchService {
 
     for (const lead of leads) {
       for (const property of properties) {
-        // منطق المطابقة (مثال: الميزانية تتوافق مع السعر، والموقع المطلوب هو موقع العقار)
-        if (
-          lead.budget >= property.price &&
-          lead.desired_location === property.location
-        ) {
-          // التأكد من عدم وجود مطابقة سابقة لهذا العميل مع هذا العقار تحديداً
+        // 🚀 1. التأكد من الغرض (بيع / إيجار) - خطوة حيوية لمنع الأخطاء الكارثية
+        const isPurposeMatch =
+          !lead.purpose || lead.purpose === property.purpose;
+
+        if (!isPurposeMatch) continue;
+
+        // 🚀 2. التحسين الأول: نوع العقار (Property Type)
+        const isTypeMatch =
+          !lead.propertyType || lead.propertyType === property.propertyType;
+
+        if (!isTypeMatch) continue;
+
+        // 🚀 3. التحسين الثاني: مرونة الموقع (Partial Location Match)
+        const leadLoc = lead.location?.toLowerCase() || '';
+        const propLoc = property.location?.toLowerCase() || '';
+        const isLocationMatch =
+          propLoc.includes(leadLoc) || leadLoc.includes(propLoc);
+
+        // 🚀 4. التحسين الثالث: مرونة الميزانية بناءً على الحد الأقصى (maxBudget)
+        const leadMaxBudget = lead.maxBudget || 0;
+        const isBudgetMatch = leadMaxBudget >= property.price * 0.9;
+
+        // إذا تحققت الشروط المرنة معاً
+        if (isLocationMatch && isBudgetMatch) {
           const existingMatch = await this.matchRepository.findOne({
-            filter: { lead: lead._id, property: property._id }, // تصحيح أسماء الحقول
+            filter: { lead: lead._id, property: property._id },
             companyId,
           });
 
           if (!existingMatch) {
-            // حساب نسبة التوافق (مثال مبسط)
-            const matchScore = lead.budget === property.price ? 100 : 85;
+            // 🚀 حساب نسبة التوافق (Match Score) بشكل ديناميكي ذكي
+            let matchScore = 100;
+
+            // خصم 10 درجات إذا كانت الميزانية أقل من السعر واضطررنا لاستخدام "المرونة"
+            if (leadMaxBudget < property.price) {
+              matchScore -= 10;
+            }
+
+            // خصم 5 درجات إذا كان التطابق في الموقع جزئياً وليس تطابقاً تاماً
+            if (propLoc !== leadLoc) {
+              matchScore -= 5;
+            }
 
             await this.matchRepository.create({
-              lead: lead._id, // تصحيح أسماء الحقول
-              property: property._id, // تصحيح أسماء الحقول
+              lead: lead._id,
+              property: property._id,
               company_id: companyId,
-              score: matchScore, // تصحيح اسم الحقل
-              status: MatchStatus.suggested, // استخدام الـ Enum
+              score: matchScore,
+              status: MatchStatus.suggested,
             });
             newMatchesCount++;
           }
@@ -78,15 +104,15 @@ export class MatchService {
     limit: number = 10,
   ) {
     return await this.matchRepository.findAll({
-      filter: { lead: leadId }, // تصحيح اسم الحقل
-      populate: 'property', // تصحيح مسار الـ Populate
+      filter: { lead: leadId },
+      populate: 'property',
       paginate: { page, limit },
-      sort: { score: -1 }, // تصحيح اسم الحقل
+      sort: { score: -1 },
       companyId,
     });
   }
 
-  // 3. تحديث حالة المطابقة (مثال: العميل وافق على العقار أو رفضه)
+  // 3. تحديث حالة المطابقة
   async updateMatchStatus(
     matchId: Types.ObjectId,
     updateMatchStatusDto: UpdateMatchStatusDto,

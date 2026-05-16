@@ -11,28 +11,11 @@ const toStream = require('buffer-to-stream');
 @Injectable()
 export class CloudinaryService {
   constructor(private configService: ConfigService) {
-    // 1. محاولة القراءة من ConfigService أو مباشرة من النظام كخطة بديلة
-    const cloudName =
-      this.configService.get<string>('CLOUD_NAME') || process.env.CLOUD_NAME;
-    const apiKey =
-      this.configService.get<string>('CLOUD_API_KEY') ||
-      process.env.CLOUD_API_KEY;
-    const apiSecret =
-      this.configService.get<string>('CLOUD_API_SECRET') ||
-      process.env.CLOUD_API_SECRET;
-
-    // 2. طباعة القيم في الـ Terminal للتأكد (أشعة سينية 🕵️‍♂️)
-    console.log('====================================');
-    console.log('☁️ CLOUDINARY CONFIG CHECK:');
-    console.log('CLOUD_NAME:', cloudName || '❌ MISSING');
-    console.log('CLOUD_API_KEY:', apiKey ? '✅ FOUND' : '❌ MISSING');
-    console.log('====================================');
-
-    // 3. حقن المفاتيح
+    //  العودة للوضع الاحترافي: قراءة المفاتيح من متغيرات Railway بأمان
     cloudinary.config({
-      cloud_name: cloudName,
-      api_key: apiKey,
-      api_secret: apiSecret,
+      cloud_name: this.configService.get<string>('CLOUD_NAME'),
+      api_key: this.configService.get<string>('CLOUD_API_KEY'),
+      api_secret: this.configService.get<string>('CLOUD_API_SECRET'),
     });
   }
 

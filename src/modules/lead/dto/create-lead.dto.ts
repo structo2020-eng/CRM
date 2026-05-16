@@ -30,11 +30,11 @@ export class CreateLeadDto {
 
   @IsString()
   @IsNotEmpty()
-  phone!: string; // تم التعديل
+  phone!: string;
 
   @IsEmail()
   @IsOptional()
-  email?: string; // تم التعديل
+  email?: string;
 
   @IsString()
   @IsOptional()
@@ -50,13 +50,13 @@ export class CreateLeadDto {
   propertyType?: PropertyType;
 
   @IsString()
-  @IsIn(['buy', 'rent', 'invest']) // الحقل الجديد
+  @IsIn(['buy', 'rent', 'invest'])
   @IsOptional()
   purpose?: string;
 
   @IsString()
   @IsOptional()
-  location?: string; // تم التعديل
+  location?: string;
 
   @IsNumber()
   @IsOptional()
@@ -71,7 +71,7 @@ export class CreateLeadDto {
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  amenities?: string[]; // تم التعديل
+  amenities?: string[];
 
   @IsString()
   @IsOptional()
@@ -91,18 +91,18 @@ export class CreateLeadDto {
 
   @IsEnum(MoveInTimeframe)
   @IsOptional()
-  moveIn?: MoveInTimeframe; // تم التعديل
+  moveIn?: MoveInTimeframe;
 
   @IsEnum(UrgencyLevel)
   @IsOptional()
-  urgency?: UrgencyLevel; // تم التعديل
+  urgency?: UrgencyLevel;
 
   @IsString()
   @IsOptional()
-  notes?: string; // تم التعديل
+  notes?: string;
 
   // --- Step 4: Assignment ---
   @IsMongoId()
   @IsOptional()
-  assigned_agent_id?: Types.ObjectId; // تم التعديل
+  assigned_agent_id?: Types.ObjectId;
 }
