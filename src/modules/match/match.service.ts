@@ -58,6 +58,25 @@ export class MatchService {
         const isBudgetMatch = leadMaxBudget >= property.price * 0.9;
 
         // إذا تحققت الشروط المرنة معاً
+        // 🚀 جهاز التنصت: لمعرفة لماذا ترفض الخوارزمية المطابقة
+        console.log(
+          `\n--- جاري فحص العميل: ${lead.firstName} مع العقار: ${property.title} ---`,
+        );
+        console.log(
+          `1. تطابق الغرض (بيع/إيجار): ${isPurposeMatch} | (${lead.purpose} == ${property.purpose})`,
+        );
+        console.log(
+          `2. تطابق النوع (فيلا/شقة): ${isTypeMatch} | (${lead.propertyType} == ${property.propertyType})`,
+        );
+        console.log(
+          `3. تطابق الموقع: ${isLocationMatch} | (${leadLoc} vs ${propLoc})`,
+        );
+        console.log(
+          `4. تطابق الميزانية: ${isBudgetMatch} | (ميزانية العميل: ${leadMaxBudget} >= سعر العقار المرن: ${property.price * 0.9})`,
+        );
+        console.log(`--------------------------------------------------\n`);
+
+        // إذا تحققت الشروط المرنة معاً
         if (isLocationMatch && isBudgetMatch) {
           const existingMatch = await this.matchRepository.findOne({
             filter: { lead: lead._id, property: property._id },
