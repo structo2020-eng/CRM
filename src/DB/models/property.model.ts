@@ -48,8 +48,16 @@ export class Property {
   @Prop({ type: [String], default: [] })
   amenities!: string[];
 
-  @Prop({ type: String, required: true })
-  location!: string;
+  // 🚀 التعديل: مفاتيح البحث الهيكلية
+  @Prop({ lowercase: true, trim: true, required: true })
+  governorate!: string;
+
+  @Prop({ lowercase: true, trim: true, required: true })
+  city!: string;
+
+  // العنوان التفصيلي القادم من الخريطة (للعرض فقط)
+  @Prop({ type: String })
+  fullAddress?: string;
 
   @Prop({ type: Number })
   latitude?: number;

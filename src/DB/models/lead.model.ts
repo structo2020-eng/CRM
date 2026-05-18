@@ -14,61 +14,62 @@ export class Lead extends Document {
   phone!: string;
 
   @Prop({ lowercase: true, trim: true })
-  email!: string;
-
-  @Prop({ trim: true })
-  nationality!: string;
-
-  @Prop({ type: String })
-  leadSource!: string;
+  email?: string;
 
   // --- Preferences ---
-  @Prop({ type: String })
+  @Prop({ required: true, type: String })
   propertyType!: string;
 
-  @Prop({ type: String })
+  @Prop({ required: true, type: String })
   purpose!: string;
 
   @Prop({ trim: true })
-  location!: string;
+  preferredLocation?: string;
 
   @Prop({ type: Number })
-  bedrooms!: number;
+  bedroomsNeeded?: number;
 
   @Prop({ type: Number })
-  bathrooms!: number;
+  bathroomsNeeded?: number;
+
+  @Prop({ type: Number })
+  areaMin?: number;
+
+  @Prop({ type: Number })
+  areaMax?: number;
 
   @Prop({ type: [String], default: [] })
-  amenities!: string[];
+  amenitiesNeeded?: string[];
 
   // --- Budget ---
-  @Prop({ type: Number })
+  @Prop({ required: true, type: Number })
   minBudget!: number;
 
-  @Prop({ type: Number })
+  @Prop({ required: true, type: Number })
   maxBudget!: number;
 
+  // --- Meta Data ---
   @Prop({ type: String })
-  moveIn!: string;
+  source?: string;
 
   @Prop({ type: String })
-  urgency!: string;
+  urgencyLevel?: string;
 
   @Prop({ trim: true })
-  notes!: string;
+  notes?: string;
 
   // --- System & Tracking Data ---
   @Prop({ type: Types.ObjectId, ref: 'Company', required: true, index: true })
   company_id!: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
-  assigned_agent_id!: Types.ObjectId;
+  assigned_agent_id?: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   created_by!: Types.ObjectId;
 
   @Prop({ type: String, default: 'new' })
-  status!: string;
+  status?: string;
 
   @Prop({ type: String })
   lostReason?: string;

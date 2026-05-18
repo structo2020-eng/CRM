@@ -18,12 +18,10 @@ export class CreatePropertyDto {
   @IsNotEmpty()
   title!: string;
 
-  // 🚀 إضافة حقل الـ ref
   @IsString()
   @IsOptional()
   ref?: string;
 
-  // 🚀 توحيد الاسم ليطابق الفرونت إند
   @IsEnum(PropertyType)
   @IsNotEmpty()
   propertyType!: PropertyType;
@@ -38,10 +36,9 @@ export class CreatePropertyDto {
 
   @IsNumber()
   @Min(0)
-  @Type(() => Number) // مهم جداً لأن form-data ترسل الأرقام كنصوص
+  @Type(() => Number)
   price!: number;
 
-  // 🚀 توحيد الاسم ليطابق الفرونت إند
   @IsNumber()
   @Min(1)
   @Type(() => Number)
@@ -62,10 +59,18 @@ export class CreatePropertyDto {
   @Type(() => Number)
   floor?: number;
 
-  // 🚀 توحيد الاسم ليطابق الفرونت إند (دمجنا المدينة والمنطقة في حقل واحد)
+  // 🚀 التعديل: إجبار إرسال المحافظة والمدينة
   @IsString()
   @IsNotEmpty()
-  location!: string;
+  governorate!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  city!: string;
+
+  @IsString()
+  @IsOptional()
+  fullAddress?: string;
 
   @IsString()
   @IsOptional()

@@ -4,7 +4,6 @@ import { I18nService } from 'nestjs-i18n';
 import { MatchRepository } from 'src/DB/repositories/match.repository';
 import { LeadRepository } from 'src/DB/repositories/lead.repository';
 import { PropertyRepository } from 'src/DB/repositories/property.repository';
-import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchStatusDto } from './dto/update-match-status.dto';
 import { MatchStatus } from 'src/DB/models/match.model';
 
@@ -17,7 +16,6 @@ export class MatchService {
     private readonly i18n: I18nService,
   ) {}
 
-  // 1. خوارزمية المطابقة التلقائية (النسخة المتوافقة تماماً مع الـ Schema)
   async generateAutoMatches(companyId: Types.ObjectId) {
     const leadsResult = await this.leadRepository.findAll({
       filter: { status: 'new' },
@@ -35,48 +33,37 @@ export class MatchService {
 
     for (const lead of leads) {
       for (const property of properties) {
-        // 🚀 1. التأكد من الغرض (بيع / إيجار) - خطوة حيوية لمنع الأخطاء الكارثية
+        // 1. الغرض (بيع / إيجار)
         const isPurposeMatch =
           !lead.purpose || lead.purpose === property.purpose;
-
         if (!isPurposeMatch) continue;
 
-        // 🚀 2. التحسين الأول: نوع العقار (Property Type)
+        // 2. نوع العقار
         const isTypeMatch =
           !lead.propertyType || lead.propertyType === property.propertyType;
-
         if (!isTypeMatch) continue;
 
-        // 🚀 3. التحسين الثاني: مرونة الموقع (Partial Location Match)
-        const leadLoc = lead.location?.toLowerCase() || '';
-        const propLoc = property.location?.toLowerCase() || '';
-        const isLocationMatch =
-          propLoc.includes(leadLoc) || leadLoc.includes(propLoc);
+        // 3. المساحة (Area) - دعم الـ areaMin و areaMax الجديدين
+        const isAreaMatch =
+          (!lead.areaMin || property.area >= lead.areaMin) &&
+          (!lead.areaMax || property.area <= lead.areaMax);
+        if (!isAreaMatch) continue;
 
-        // 🚀 4. التحسين الثالث: مرونة الميزانية بناءً على الحد الأقصى (maxBudget)
+        // 4. الموقع (البحث بالنص الجديد preferredLocation داخل المحافظة والمدينة للعقار)
+        const leadLoc = lead.preferredLocation?.toLowerCase() || '';
+        const propGov = property.governorate?.toLowerCase() || '';
+        const propCity = property.city?.toLowerCase() || '';
+
+        const isLocationMatch =
+          !leadLoc ||
+          propGov.includes(leadLoc) ||
+          propCity.includes(leadLoc) ||
+          leadLoc.includes(propCity);
+
+        // 5. الميزانية
         const leadMaxBudget = lead.maxBudget || 0;
         const isBudgetMatch = leadMaxBudget >= property.price * 0.9;
 
-        // إذا تحققت الشروط المرنة معاً
-        // 🚀 جهاز التنصت: لمعرفة لماذا ترفض الخوارزمية المطابقة
-        console.log(
-          `\n--- جاري فحص العميل: ${lead.firstName} مع العقار: ${property.title} ---`,
-        );
-        console.log(
-          `1. تطابق الغرض (بيع/إيجار): ${isPurposeMatch} | (${lead.purpose} == ${property.purpose})`,
-        );
-        console.log(
-          `2. تطابق النوع (فيلا/شقة): ${isTypeMatch} | (${lead.propertyType} == ${property.propertyType})`,
-        );
-        console.log(
-          `3. تطابق الموقع: ${isLocationMatch} | (${leadLoc} vs ${propLoc})`,
-        );
-        console.log(
-          `4. تطابق الميزانية: ${isBudgetMatch} | (ميزانية العميل: ${leadMaxBudget} >= سعر العقار المرن: ${property.price * 0.9})`,
-        );
-        console.log(`--------------------------------------------------\n`);
-
-        // إذا تحققت الشروط المرنة معاً
         if (isLocationMatch && isBudgetMatch) {
           const existingMatch = await this.matchRepository.findOne({
             filter: { lead: lead._id, property: property._id },
@@ -84,17 +71,10 @@ export class MatchService {
           });
 
           if (!existingMatch) {
-            // 🚀 حساب نسبة التوافق (Match Score) بشكل ديناميكي ذكي
             let matchScore = 100;
 
-            // خصم 10 درجات إذا كانت الميزانية أقل من السعر واضطررنا لاستخدام "المرونة"
             if (leadMaxBudget < property.price) {
               matchScore -= 10;
-            }
-
-            // خصم 5 درجات إذا كان التطابق في الموقع جزئياً وليس تطابقاً تاماً
-            if (propLoc !== leadLoc) {
-              matchScore -= 5;
             }
 
             await this.matchRepository.create({
@@ -115,7 +95,6 @@ export class MatchService {
     };
   }
 
-  // 2. جلب المطابقات الخاصة بعميل معين
   async getMatchesForLead(
     leadId: Types.ObjectId,
     companyId: Types.ObjectId,
@@ -131,7 +110,6 @@ export class MatchService {
     });
   }
 
-  // 3. تحديث حالة المطابقة
   async updateMatchStatus(
     matchId: Types.ObjectId,
     updateMatchStatusDto: UpdateMatchStatusDto,

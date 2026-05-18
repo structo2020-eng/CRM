@@ -1,7 +1,6 @@
 import {
   IsArray,
   IsEmail,
-  IsEnum,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -10,22 +9,15 @@ import {
   IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Types } from 'mongoose';
-import {
-  LeadSource,
-  PropertyType,
-  MoveInTimeframe,
-  UrgencyLevel,
-} from 'src/DB/enums/lead.enum';
 
 export class CreateLeadDto {
-  // --- Step 1: Contact Info ---
-  @IsString({ message: 'First name must be a string' })
-  @IsNotEmpty({ message: 'First name is required' })
+  // --- Contact Info ---
+  @IsString()
+  @IsNotEmpty()
   firstName!: string;
 
-  @IsString({ message: 'Last name must be a string' })
-  @IsNotEmpty({ message: 'Last name is required' })
+  @IsString()
+  @IsNotEmpty()
   lastName!: string;
 
   @IsString()
@@ -36,73 +28,75 @@ export class CreateLeadDto {
   @IsOptional()
   email?: string;
 
+  // --- Preferences ---
   @IsString()
-  @IsOptional()
-  nationality?: string;
-
-  @IsEnum(LeadSource)
-  @IsOptional()
-  leadSource?: LeadSource;
-
-  // --- Step 2: Preferences ---
-  @IsEnum(PropertyType)
-  @IsOptional()
-  propertyType?: PropertyType;
+  @IsNotEmpty()
+  propertyType!: string;
 
   @IsString()
   @IsIn(['buy', 'rent', 'invest'])
-  @IsOptional()
-  purpose?: string;
+  @IsNotEmpty()
+  purpose!: string;
 
   @IsString()
   @IsOptional()
-  location?: string;
+  preferredLocation?: string;
 
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  bedrooms?: number;
+  bedroomsNeeded?: number;
 
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  bathrooms?: number;
+  bathroomsNeeded?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  areaMin?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  areaMax?: number;
 
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
-  amenities?: string[];
+  amenitiesNeeded?: string[];
+
+  // --- Budget ---
+  @IsNumber()
+  @IsNotEmpty()
+  @Type(() => Number)
+  minBudget!: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @Type(() => Number)
+  maxBudget!: number;
+
+  // --- Meta Data ---
+  @IsString()
+  @IsOptional()
+  source?: string;
 
   @IsString()
   @IsOptional()
-  @IsIn(['new', 'contacted', 'qualified', 'lost'])
-  status?: string;
-
-  // --- Step 3: Budget ---
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  minBudget?: number;
-
-  @IsNumber()
-  @IsOptional()
-  @Type(() => Number)
-  maxBudget?: number;
-
-  @IsEnum(MoveInTimeframe)
-  @IsOptional()
-  moveIn?: MoveInTimeframe;
-
-  @IsEnum(UrgencyLevel)
-  @IsOptional()
-  urgency?: UrgencyLevel;
+  urgencyLevel?: string;
 
   @IsString()
   @IsOptional()
   notes?: string;
 
-  // --- Step 4: Assignment ---
+  @IsString()
+  @IsOptional()
+  status?: string;
+
+  // --- System ---
   @IsMongoId()
   @IsOptional()
-  assigned_agent_id?: Types.ObjectId;
+  assigned_agent_id?: string;
 }
