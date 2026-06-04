@@ -39,6 +39,9 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 // استيراد الحراس (Guards) لتطبيقهم على مستوى النظام
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { RolesGuard } from './common/guards/roles.guard';
+import { UnitModule } from './modules/unit/unit.module';
+import { BuildingModule } from './modules/building/building.module';
+import { AuditModule } from './modules/audit/audit.module';
 
 @Module({
   imports: [
@@ -122,7 +125,6 @@ import { RolesGuard } from './common/guards/roles.guard';
     AuthModule,
     LeadModule,
     BranchModule,
-    ProjectModule,
     TasksModule,
     HealthModule,
     CloudinaryModule,
@@ -136,6 +138,10 @@ import { RolesGuard } from './common/guards/roles.guard';
     VisitModule, // <-- تم الإضافة
     ActivityModule, // <-- تم الإضافة
     AnalyticsModule, // <-- تم الإضافة
+    AuditModule,
+    ProjectModule,
+    BuildingModule,
+    UnitModule,
   ],
   providers: [
     // تطبيق حماية JWT و Roles على كل مسارات النظام افتراضياً

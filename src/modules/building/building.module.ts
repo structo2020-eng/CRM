@@ -1,29 +1,25 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Project, ProjectModel } from 'src/DB/models/project.model';
 import { Building, BuildingModel } from 'src/DB/models/building.model';
 import { Unit, UnitModel } from 'src/DB/models/unit.model';
-import { ProjectRepository } from 'src/DB/repositories/project.repository';
 import { BuildingRepository } from 'src/DB/repositories/building.repository';
 import { UnitRepository } from 'src/DB/repositories/unit.repository';
-import { ProjectService } from './project.service';
-import { ProjectController } from './project.controller';
+import { BuildingService } from './building.service';
+import { BuildingController } from './building.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Project.name, schema: ProjectModel },
       { name: Building.name, schema: BuildingModel },
-      { name: Unit.name, schema: UnitModel },
+      { name: Unit.name, schema: UnitModel }, //  مطلوب لعملية الحذف الآمن
     ]),
   ],
-  controllers: [ProjectController],
+  controllers: [BuildingController],
   providers: [
-    ProjectRepository,
     BuildingRepository,
-    UnitRepository,
-    ProjectService,
+    UnitRepository, //  تسجيل الـ Repository الخاص بالوحدات هنا
+    BuildingService,
   ],
-  exports: [ProjectService, ProjectRepository],
+  exports: [BuildingService, BuildingRepository],
 })
-export class ProjectModule {}
+export class BuildingModule {}
